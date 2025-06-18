@@ -1,2 +1,2 @@
 # valkey-chat
-Hummingbird server framework project
+Chat server demonstrating Valkey swift.
