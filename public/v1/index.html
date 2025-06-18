@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8" />
+  <title>Valkey PubSub Chat</title>
+  <script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://localhost:8080/v1/chat";
+  var input;
+  var output;
+
+  function init() {
+    input = document.getElementById("input");
+    output = document.getElementById("output");
+
+    input.value = ""
+    input.style.display = 'none'
+  }
+
+  function connect() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const myParam = urlParams.get('name');
+    if (myParam) {
+      let uri = wsUri + "?username=" + myParam
+      openWebSocket(uri)
+
+      input.style.display = 'block'
+      document.getElementById("connectButton").style.display = 'none'
+      document.getElementById("loggedIn").innerText = `Logged in as ${myParam}`
+    } else {
+      writeToScreen("You forgot to tell us your name");
+    }
+  }
+
+  function openWebSocket(uri) {
+    websocket = new WebSocket(uri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+  }
+
+  function onOpen(evt) {
+
+  }
+
+  function onClose(evt) {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt) {
+    writeToScreen('<span style="color: blue;">' + evt.data + '</span>');
+  }
+
+  function doSend(message) {
+    websocket.send(message);
+  }
+
+  function writeToScreen(message) {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  function inputEnter() {
+    if (input.value == "") {
+      return
+    }
+    doSend(input.value)
+    input.value = ""
+  }
+
+  window.addEventListener("load", init, false);
+  </script>
+</head>
+<body>
+  <h2>Valkey PubSub Chat</h2>
+  <h4 id="loggedIn"></h4>
+  <div id="output"></div>
+  <div><input id="connectButton" type="button" value="Connect" onclick="connect()" /></div>
+  <input id="input" onchange = "inputEnter()" type="text" name="name" style="width: 90%;"/>
+</body>
