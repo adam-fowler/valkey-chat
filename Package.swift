@@ -11,9 +11,9 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird-websocket.git", from: "2.0.0"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird-websocket.git", branch: "redirect-fresh-connection"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0"),
-        .package(url: "git@github.com:adam-fowler/valkey-swift.git", branch: "resp-bulk-string"),
+        .package(url: "https://github.com/valkey-io/valkey-swift.git", branch: "main"),
     ],
     targets: [
         .executableTarget(

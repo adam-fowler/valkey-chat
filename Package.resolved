@@ -1,5 +1,5 @@
 {
-  "originHash" : "fd8d5a4c868c0928118a5e7d544e1ac871ca85adf5270a347ad0fa9b219d282a",
+  "originHash" : "f6e5317706cdefcd95c38bd0f9b9c90ed7e9070ab93d48ed616ad8fcb2131dc5",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird-websocket.git",
       "state" : {
-        "revision" : "974ab0d7a7876bb6cbb1ceb5ce55e52c100ad8d7",
-        "version" : "2.5.0"
+        "branch" : "redirect-fresh-connection",
+        "revision" : "f827011005f040e26a7eb6e2a2ff678364a916ff"
       }
     },
     {
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-distributed-tracing.git",
       "state" : {
-        "revision" : "a64a0abc2530f767af15dd88dda7f64d5f1ff9de",
-        "version" : "1.2.0"
+        "revision" : "b78796709d243d5438b36e74ce3c5ec2d2ece4d8",
+        "version" : "1.2.1"
       }
     },
     {
@@ -247,10 +247,10 @@
     {
       "identity" : "valkey-swift",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:adam-fowler/valkey-swift.git",
+      "location" : "https://github.com/valkey-io/valkey-swift.git",
       "state" : {
-        "branch" : "resp-bulk-string",
-        "revision" : "a89f4af298f32a844cd008dceb9716cf05def4b8"
+        "branch" : "main",
+        "revision" : "8de1d14133eb11eed54d317afbdaf43ef0e12434"
       }
     }
   ],

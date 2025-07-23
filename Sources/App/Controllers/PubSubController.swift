@@ -28,9 +28,9 @@ struct PubSubController {
                     /// Read messages from WebSocket and publish them to the channel
                     for try await frame in inbound.messages(maxSize: 1_000_000) {
                         guard case .text(let message) = frame else { continue }
-                        _ = try await self.valkey.publish(channel: self.channel, message: "[\(name)] - \(message)")
+                        try await self.valkey.publish(channel: self.channel, message: "[\(name)] - \(message)")
                     }
-                    _ = try await self.valkey.publish(channel: self.channel, message: "\(name) left.")
+                    try await self.valkey.publish(channel: self.channel, message: "\(name) left.")
                 }
 
                 group.addTask {
@@ -39,7 +39,7 @@ struct PubSubController {
                         /// Subscribe to channel and write any messages we receive back to user
                         try await connection.subscribe(to: [self.channel]) { subscription in
                             for try await item in subscription {
-                                try await outbound.write(.text(item.message))
+                                try await outbound.write(.text(String(buffer: item.message)))
                             }
                         }
                     }
