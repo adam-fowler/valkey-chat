@@ -18,7 +18,6 @@ struct ChatController {
             }
             return .upgrade([:])
         } onUpgrade: { inbound, outbound, context in
-            // only allow upgrade if username and channel query parameter exists
             let username = try context.request.uri.queryParameters.require("username")
             let channelName = try context.request.uri.queryParameters.require("channel")
             /// Setup key names
@@ -34,7 +33,7 @@ struct ChatController {
                         // construct message text
                         let messageText = "[\(username)] - \(message)"
 
-                        // Publish to channel and add to message list
+                        // Publish to channel and add to message stream
                         _ = await self.valkey.execute(
                             PUBLISH(channel: messagesChannel, message: messageText),
                             // Add message to stream
