@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
-  <title>Valkey PubSub Chat</title>
+  <title>Valkey Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script language="javascript" type="text/javascript">
 
-  var wsUri = "ws://localhost:8080/v1/chat";
+  var wsUri = "/api/chat";
   var input;
   var output;
 
@@ -18,17 +19,23 @@
 
   function connect() {
     const urlParams = new URLSearchParams(window.location.search);
-    const myParam = urlParams.get('name');
-    if (myParam) {
-      let uri = wsUri + "?username=" + myParam
-      openWebSocket(uri)
-
-      input.style.display = 'block'
-      document.getElementById("connectButton").style.display = 'none'
-      document.getElementById("loggedIn").innerText = `Logged in as ${myParam}`
-    } else {
+    const nameParam = urlParams.get('username');
+    if (nameParam == undefined) {
       writeToScreen("You forgot to tell us your name");
+      return
     }
+    const channelParam = urlParams.get('channel');
+    if (channelParam == undefined) {
+      writeToScreen("You forgot to select a channel");
+      return
+    }
+    let uri = `${wsUri}?username=${nameParam}&channel=${channelParam}`
+    openWebSocket(uri)
+
+    input.style.display = 'block'
+    document.getElementById("connectButton").style.display = 'none'
+    document.getElementById("loggedIn").innerText = `Logged in as ${nameParam}`
+    document.getElementById("title").innerText = `#${channelParam}`
   }
 
   function openWebSocket(uri) {
@@ -73,7 +80,7 @@
   </script>
 </head>
 <body>
-  <h2>Valkey PubSub Chat</h2>
+  <h2 id="title">Valkey Stream Chat</h2>
   <h4 id="loggedIn"></h4>
   <div id="output"></div>
   <div><input id="connectButton" type="button" value="Connect" onclick="connect()" /></div>

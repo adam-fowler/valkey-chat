@@ -1,5 +1,5 @@
 {
-  "originHash" : "f6e5317706cdefcd95c38bd0f9b9c90ed7e9070ab93d48ed616ad8fcb2131dc5",
+  "originHash" : "4b770999824ad262fc483e2346343eacfa228ff93f2a0baf00eac6ede0c8b5b2",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird-websocket.git",
       "state" : {
-        "branch" : "redirect-fresh-connection",
-        "revision" : "f827011005f040e26a7eb6e2a2ff678364a916ff"
+        "revision" : "716c54294152c6d3301a6239a1d74db57cbcd6dc",
+        "version" : "2.6.0"
       }
     },
     {
@@ -249,8 +249,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/valkey-io/valkey-swift.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "8de1d14133eb11eed54d317afbdaf43ef0e12434"
+        "branch" : "0.1.0",
+        "revision" : "74c27519adc2d142e762de0b06a534bcb5177d33"
       }
     }
   ],

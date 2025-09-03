@@ -23,15 +23,9 @@ public func buildApplication(
 ) async throws
     -> some ApplicationProtocol
 {
-    let environment = Environment()
-    let logger = {
-        var logger = Logger(label: "valkey-chat")
-        logger.logLevel =
-            arguments.logLevel ?? environment.get("LOG_LEVEL").flatMap {
-                Logger.Level(rawValue: $0)
-            } ?? .debug
-        return logger
-    }()
+    var logger = Logger(label: "valkey-chat")
+    logger.logLevel = .debug
+
     let valkey = ValkeyClient(.hostname("localhost"), logger: logger)
     let router = buildRouter()
     let wsRouter = buildWebSocketRouter(valkey: valkey)
@@ -65,7 +59,6 @@ func buildRouter() -> Router<AppRequestContext> {
 func buildWebSocketRouter(valkey: ValkeyClient) -> Router<BasicWebSocketRequestContext> {
     let router = Router(context: BasicWebSocketRequestContext.self)
     router.add(middleware: LogRequestsMiddleware(.debug))
-    router.addRoutes(PubSubController(valkey: valkey).routes)
-    router.addRoutes(StreamController(valkey: valkey).routes)
+    router.addRoutes(ChatController(valkey: valkey).routes)
     return router
 }
