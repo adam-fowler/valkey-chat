@@ -50,11 +50,11 @@ struct ChatController {
                 }
 
                 group.addTask {
-                    // Read messages already posted. (read messages from the last 10 minutes)
+                    // Read messages already posted. (read messages from the last 10 minutes up to a maximum of 100 messages).
                     let id = "\(Int((Date.now.timeIntervalSince1970 - 600) * 1000))"
-                    let messages = try await self.valkey.xrange(messagesKey, start: id, end: "+")
+                    let messages = try await self.valkey.xrevrange(messagesKey, end: "+", start: id, count: 100)
                     // write those messages to the websocket
-                    for message in messages {
+                    for message in messages.reversed() {
                         guard let name = message[field: "name"].map({ String(buffer: $0) }),
                             let message = message[field: "message"].map({ String(buffer: $0) })
                         else {
