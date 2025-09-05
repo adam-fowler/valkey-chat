@@ -24,9 +24,11 @@ public func buildApplication(
     -> some ApplicationProtocol
 {
     var logger = Logger(label: "valkey-chat")
-    logger.logLevel = .debug
+    logger.logLevel = arguments.logLevel ?? .debug
 
-    let valkey = ValkeyClient(.hostname("localhost"), logger: logger)
+    // Valkey client
+    let valkey = ValkeyClient(.hostname("127.0.0.1"), logger: logger)
+
     let router = buildRouter()
     let wsRouter = buildWebSocketRouter(valkey: valkey)
     let app = Application(

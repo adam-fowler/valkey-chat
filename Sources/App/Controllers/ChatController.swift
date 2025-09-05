@@ -62,12 +62,10 @@ struct ChatController {
                         }
                         try await outbound.write(.text("[\(name)] - \(message)"))
                     }
-                    try await valkey.withConnection { connection in
-                        /// Subscribe to channel and write any messages we receive to websocket
-                        try await connection.subscribe(to: [messagesChannel]) { subscription in
-                            for try await item in subscription {
-                                try await outbound.write(.text(String(buffer: item.message)))
-                            }
+                    /// Subscribe to channel and write any messages we receive to websocket
+                    try await valkey.subscribe(to: [messagesChannel]) { subscription in
+                        for try await item in subscription {
+                            try await outbound.write(.text(String(buffer: item.message)))
                         }
                     }
                 }
