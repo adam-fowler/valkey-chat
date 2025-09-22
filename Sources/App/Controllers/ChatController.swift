@@ -18,6 +18,10 @@ struct ChatController {
             }
             return .upgrade([:])
         } onUpgrade: { inbound, outbound, context in
+            struct ChatMessage: Codable {
+                let username: String
+                let message: String
+            }
             let username = try context.request.uri.queryParameters.require("username")
             let channelName = try context.request.uri.queryParameters.require("channel")
             /// Setup key names
@@ -32,11 +36,11 @@ struct ChatController {
                         guard case .text(let message) = frame else { continue }
 
                         // construct message text
-                        let messageText = "[\(username)] - \(message)"
+                        let chatMessage = ChatMessage(username: username, message: message)
 
                         // Publish to channel and add to message stream
-                        _ = await self.valkey.execute(
-                            PUBLISH(channel: messagesChannel, message: messageText),
+                        _ = try await self.valkey.execute(
+                            PUBLISH(channel: messagesChannel, message: JSONEncoder().encode(chatMessage)),
                             XADD(
                                 messagesKey,
                                 idSelector: .autoId,
@@ -55,17 +59,19 @@ struct ChatController {
                     let messages = try await self.valkey.xrevrange(messagesKey, end: "+", start: id, count: 100)
                     // write those messages to the websocket
                     for message in messages.reversed() {
-                        guard let name = message[field: "username"].map({ String(buffer: $0) }),
+                        guard let username = message[field: "username"].map({ String(buffer: $0) }),
                             let message = message[field: "message"].map({ String(buffer: $0) })
                         else {
                             continue
                         }
-                        try await outbound.write(.text("[\(name)] - \(message)"))
+                        try await outbound.write(.text("[\(username)] - \(message)"))
                     }
                     /// Subscribe to channel and write any messages we receive to websocket
                     try await valkey.subscribe(to: [messagesChannel]) { subscription in
                         for try await item in subscription {
-                            try await outbound.write(.text(String(buffer: item.message)))
+                            if let chatMessage = try? JSONDecoder().decode(ChatMessage.self, from: item.message) {
+                                try await outbound.write(.text("[\(chatMessage.username)] - \(chatMessage.message)"))
+                            }
                         }
                     }
                 }
