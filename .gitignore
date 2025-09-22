@@ -7,5 +7,6 @@
 xcuserdata/
 /.vscode/*
 !/.vscode/hummingbird.code-snippets
+!/.vscode/valkey-chat.code-snippets
 .env.*
 .env
