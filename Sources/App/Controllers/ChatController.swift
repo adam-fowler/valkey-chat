@@ -38,34 +38,12 @@ struct ChatController {
                         // construct message text
                         let chatMessage = ChatMessage(username: username, message: message)
 
-                        // Publish to channel and add to message stream
-                        _ = try await self.valkey.execute(
-                            PUBLISH(channel: messagesChannel, message: JSONEncoder().encode(chatMessage)),
-                            XADD(
-                                messagesKey,
-                                idSelector: .autoId,
-                                data: [
-                                    .init(field: "username", value: "\(username)"),
-                                    .init(field: "message", value: "\(message)"),
-                                ]
-                            )
-                        )
+                        // Publish to channel
+                        try await self.valkey.publish(channel: messagesChannel, message: JSONEncoder().encode(chatMessage))
                     }
                 }
 
                 group.addTask {
-                    // Read messages already posted. (read messages from the last 10 minutes up to a maximum of 100 messages).
-                    let id = "\(Int((Date.now.timeIntervalSince1970 - 600) * 1000))"
-                    let messages = try await self.valkey.xrevrange(messagesKey, end: "+", start: id, count: 100)
-                    // write those messages to the websocket
-                    for message in messages.reversed() {
-                        guard let username = message[field: "username"].map({ String(buffer: $0) }),
-                            let message = message[field: "message"].map({ String(buffer: $0) })
-                        else {
-                            continue
-                        }
-                        try await outbound.write(.text("[\(username)] - \(message)"))
-                    }
                     /// Subscribe to channel and write any messages we receive to websocket
                     try await valkey.subscribe(to: [messagesChannel]) { subscription in
                         for try await item in subscription {
