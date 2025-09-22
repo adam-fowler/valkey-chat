@@ -2,9 +2,8 @@
     "XADD": {
         "prefix": "xadd",
         "body": [
-            "// Publish to channel and add to message stream",
-            "_ = try await self.valkey.execute(",
-            "\tPUBLISH(channel: messagesChannel, message: JSONEncoder().encode(chatMessage)),",
+            "// Add to message stream and publish to channel",
+            "_ = await self.valkey.execute(",
             "\tXADD(",
             "\t\tmessagesKey,",
             "\t\tidSelector: .autoId,",
@@ -12,7 +11,8 @@
             "\t\t\t.init(field: \"username\", value: \"\\(username)\"),",
             "\t\t\t.init(field: \"message\", value: \"\\(message)\"),",
             "\t\t]",
-            "\t)",
+            "\t),",
+            "\tPUBLISH(channel: messagesChannel, message: messageText)",
             ")"
         ],
         "description": "PUBLISH,XADD"
@@ -23,6 +23,7 @@
             "// Read messages already posted. (read messages from the last 10 minutes up to a maximum of 100 messages).",
             "let id = \"\\(Int((Date.now.timeIntervalSince1970 - 600) * 1000))\"",
             "let messages = try await self.valkey.xrevrange(messagesKey, end: \"+\", start: id, count: 100)",
+            "",
             "// write those messages to the websocket",
             "for message in messages.reversed() {",
             "\tguard let username = message[field: \"username\"].map({ String(buffer: \\$0) }),",

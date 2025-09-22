@@ -36,20 +36,19 @@ struct ChatController {
                         guard case .text(let message) = frame else { continue }
 
                         // construct message text
-                        let chatMessage = ChatMessage(username: username, message: message)
+                        let messageText = "[\(username)] - \(message)"
 
                         // Publish to channel
-                        try await self.valkey.publish(channel: messagesChannel, message: JSONEncoder().encode(chatMessage))
+                        try await self.valkey.publish(channel: messagesChannel, message: messageText)
                     }
                 }
 
                 group.addTask {
                     /// Subscribe to channel and write any messages we receive to websocket
                     try await valkey.subscribe(to: [messagesChannel]) { subscription in
-                        for try await item in subscription {
-                            if let chatMessage = try? JSONDecoder().decode(ChatMessage.self, from: item.message) {
-                                try await outbound.write(.text("[\(chatMessage.username)] - \(chatMessage.message)"))
-                            }
+                        for try await event in subscription {
+                            let message = String(buffer: event.message)
+                            try await outbound.write(.text(message))
                         }
                     }
                 }
