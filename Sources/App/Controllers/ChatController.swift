@@ -13,15 +13,13 @@ struct ChatController {
 
         routes.ws("api/chat") { request, _ in
             // only allow upgrade if username and channel query parameters exist
-            guard request.uri.queryParameters["username"] != nil, request.uri.queryParameters["channel"] != nil else {
+            guard request.uri.queryParameters["username"] != nil,
+                request.uri.queryParameters["channel"] != nil
+            else {
                 return .dontUpgrade
             }
             return .upgrade([:])
         } onUpgrade: { inbound, outbound, context in
-            struct ChatMessage: Codable {
-                let username: String
-                let message: String
-            }
             let username = try context.request.uri.queryParameters.require("username")
             let channelName = try context.request.uri.queryParameters.require("channel")
             /// Setup key names
