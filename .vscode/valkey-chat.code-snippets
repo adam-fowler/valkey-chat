@@ -23,7 +23,13 @@
             "// Read messages already posted. (read messages from the last 10 minutes up to a maximum of 100 messages).",
             "let id = \"\\(Int((Date.now.timeIntervalSince1970 - 600) * 1000))\"",
             "let messages = try await self.valkey.xrevrange(messagesKey, end: \"+\", start: id, count: 100)",
-            "",
+            ""
+        ],
+        "description": "PUBLISH,XADD"
+    },
+    "Write to Websocket": {
+        "prefix": "ws",
+        "body": [
             "// write those messages to the websocket",
             "for message in messages.reversed() {",
             "\tguard let username = message[field: \"username\"].map({ String(buffer: \\$0) }),",
@@ -32,8 +38,8 @@
             "\t\tcontinue",
             "\t}",
             "\ttry await outbound.write(.text(\"[\\(username)] - \\(message)\"))",
-            "}"
-        ],
-        "description": "PUBLISH,XADD"
+            "}",
+            ""
+        ]
     }
 }
