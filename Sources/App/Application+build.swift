@@ -20,9 +20,7 @@ typealias AppRequestContext = BasicRequestContext
 /// - Parameter arguments: application arguments
 public func buildApplication(
     _ arguments: some AppArguments
-) async throws
-    -> some ApplicationProtocol
-{
+) async throws -> some ApplicationProtocol {
     var logger = Logger(label: "valkey-chat")
     logger.logLevel = arguments.logLevel ?? .debug
 
