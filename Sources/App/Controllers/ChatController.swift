@@ -13,15 +13,13 @@ struct ChatController {
 
         routes.ws("api/chat") { request, _ in
             // only allow upgrade if username and channel query parameters exist
-            guard request.uri.queryParameters["username"] != nil, request.uri.queryParameters["channel"] != nil else {
+            guard request.uri.queryParameters["username"] != nil,
+                request.uri.queryParameters["channel"] != nil
+            else {
                 return .dontUpgrade
             }
             return .upgrade([:])
         } onUpgrade: { inbound, outbound, context in
-            struct ChatMessage: Codable {
-                let username: String
-                let message: String
-            }
             let username = try context.request.uri.queryParameters.require("username")
             let channelName = try context.request.uri.queryParameters.require("channel")
             /// Setup key names
@@ -39,7 +37,7 @@ struct ChatController {
                         let messageText = "[\(username)] - \(message)"
 
                         // Add to message stream and publish to channel
-                        _ = await self.valkey.execute(
+                        let responses = await self.valkey.execute(
                             XADD(
                                 messagesKey,
                                 idSelector: .autoId,
@@ -50,16 +48,20 @@ struct ChatController {
                             ),
                             PUBLISH(channel: messagesChannel, message: messageText)
                         )
+                        _ = try responses.1.get()
                     }
                 }
 
                 group.addTask {
-                    // Read messages already posted. (read messages from the last 10 minutes up to a maximum of 100 messages).
+                    // Read messages already posted. (read messages from the last 10 minutes)
                     let id = "\(Int((Date.now.timeIntervalSince1970 - 600) * 1000))"
-                    let messages = try await self.valkey.xrevrange(messagesKey, end: "+", start: id, count: 100)
-
+                    let messages = try await self.valkey.xrange(
+                        messagesKey,
+                        start: id,
+                        end: "+"
+                    )
                     // write those messages to the websocket
-                    for message in messages.reversed() {
+                    for message in messages {
                         guard let username = message[field: "username"].map({ String(buffer: $0) }),
                             let message = message[field: "message"].map({ String(buffer: $0) })
                         else {
