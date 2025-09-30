@@ -17,17 +17,15 @@
         ],
         "description": "PUBLISH,XADD"
     },
-    "XREVRANGE": {
-        "prefix": "xrevrange",
+    "XRANGE": {
+        "prefix": "xrange",
         "body": [
-            "// Read messages already posted. (read messages from the last 10 minutes",
-            "// up to a maximum of 100 messages).",
+            "// Read messages already posted. (read messages from the last 10 minutes)",
             "let id = \"\\(Int((Date.now.timeIntervalSince1970 - 600) * 1000))\"",
-            "let messages = try await self.valkey.xrevrange(",
+            "let messages = try await self.valkey.xrange(",
             "\tmessagesKey,",
-            "\tend: \"+\",",
             "\tstart: id,",
-            "\tcount: 100",
+            "\tend: \"+\"",
             ")",
             ""
         ],
@@ -37,7 +35,7 @@
         "prefix": "ws",
         "body": [
             "// write those messages to the websocket",
-            "for message in messages.reversed() {",
+            "for message in messages {",
             "\tguard let username = message[field: \"username\"].map({ String(buffer: \\$0) }),",
             "\t\tlet message = message[field: \"message\"].map({ String(buffer: \\$0) })",
             "\telse {",
