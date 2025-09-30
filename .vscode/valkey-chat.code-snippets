@@ -3,7 +3,7 @@
         "prefix": "xadd",
         "body": [
             "// Add to message stream and publish to channel",
-            "_ = await self.valkey.execute(",
+            "let responses = await self.valkey.execute(",
             "\tXADD(",
             "\t\tmessagesKey,",
             "\t\tidSelector: .autoId,",
@@ -13,7 +13,8 @@
             "\t\t]",
             "\t),",
             "\tPUBLISH(channel: messagesChannel, message: messageText)",
-            ")"
+            ")",
+            "_ = try responses.1.get()"
         ],
         "description": "PUBLISH,XADD"
     },
