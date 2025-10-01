@@ -29,9 +29,9 @@ struct ChatController {
             await withThrowingTaskGroup(of: Void.self) { group in
                 group.addTask {
                     /// Read messages from WebSocket
-                    for try await frame in inbound.messages(maxSize: 1_000_000) {
+                    for try await wsMessage in inbound.messages(maxSize: 1_000_000) {
                         // Ignore non text frames
-                        guard case .text(let message) = frame else { continue }
+                        guard case .text(let message) = wsMessage else { continue }
 
                         // construct message text
                         let messageText = "[\(username)] - \(message)"
