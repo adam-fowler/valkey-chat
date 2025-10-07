@@ -1,6 +1,9 @@
+import AsyncAlgorithms
 import Foundation
 import Hummingbird
 import HummingbirdWebSocket
+import ServiceLifecycle
+import Synchronization
 import Valkey
 
 struct ChatController {
@@ -72,9 +75,11 @@ struct ChatController {
 
                     /// Subscribe to channel and write any messages we receive to websocket
                     try await valkey.subscribe(to: [messagesChannel]) { subscription in
-                        for try await event in subscription {
-                            let message = String(buffer: event.message)
-                            try await outbound.write(.text(message))
+                        try await cancelWhenGracefulShutdown {
+                            for try await event in subscription {
+                                let message = String(buffer: event.message)
+                                try await outbound.write(.text(message))
+                            }
                         }
                     }
                 }

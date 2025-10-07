@@ -31,6 +31,7 @@ let package = Package(
             dependencies: [
                 .byName(name: "Chat"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
+                .product(name: "HummingbirdWSTesting", package: "hummingbird-websocket"),
             ],
             path: "Tests/AppTests"
         ),
